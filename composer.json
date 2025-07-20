@@ -12,7 +12,7 @@
             "App\\": "src/"
         }
     },
-    "script": {
+    "scripts": {
         "dev": "php -S localhost:8000 -t public" 
     }
 }
