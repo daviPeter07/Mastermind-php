@@ -1,21 +1,29 @@
 services:
-  postgres:
-    image: postgres:15
 
-    container_name: mastermind_php_db
+  app:
 
-    restart: always
-
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    
+    build: .
+    container_name: mastermind_php_app
     ports:
-      - "${DB_PORT}:5432"
-
+      - "8000:8000"
     volumes:
-      - postgres_php_data:/var/lib/postgresql/data
+      - .:/app
+
+    depends_on:
+      - postgres
+   
+    postgres:
+      image: postgres:15
+      container_name: mastermind_php_db
+      restart: always
+      environment:
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB}
+      ports:
+        - "${DB_PORT}:5432"
+      volumes:
+        - postgres_php_data:/var/lib/postgresql/data
 
 volumes:
   postgres_php_data:
