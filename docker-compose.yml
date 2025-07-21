@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   app:
     build: .
@@ -8,6 +10,11 @@ services:
       - .:/app
     depends_on:
       - postgres
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_PORT=${DB_PORT}
 
   postgres:
     image: postgres:15
@@ -21,7 +28,7 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_php_data:/var/lib/postgresql/data
-      - ./Database/migration.sql:/docker-entrypoint-initdb.d/migration.sql
+      - ./Database/migration.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   postgres_php_data:
