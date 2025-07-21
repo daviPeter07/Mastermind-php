@@ -13,7 +13,7 @@ class Router {
     $this->routes["GET"][$uri] = $action;
   }
 
-  public function dispacth(){
+  public function dispatch(){
     $uri = $_SERVER["REQUEST_URI"];
     $method = $_SERVER["REQUEST_METHOD"];
 
