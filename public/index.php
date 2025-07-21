@@ -15,6 +15,3 @@ $router = new Router();
 $router->post('/api/register', [AuthController::class, 'register']);
 
 $router->dispatch();
-
-
-echo "hello world";

@@ -25,7 +25,7 @@ class Router {
       $controller->$controllerMethod();
     } else {
       http_response_code(404);
-      echo json_encode(["error" => "Endpoint não encontrada"]);
+      echo json_encode(["error" => "Endpoint não encontrado"]);
     }
   }
 }
