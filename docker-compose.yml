@@ -21,6 +21,7 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_php_data:/var/lib/postgresql/data
+      - ./Database/migration.sql:/docker-entrypoint-initdb.d/migration.sql
 
 volumes:
   postgres_php_data:
