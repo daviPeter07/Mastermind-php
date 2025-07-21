@@ -13,7 +13,7 @@ class AuthService {
     $this->db = Database::getConnection();
   }
 
-  /**
+    /**
      * Registra um novo usuário no banco de dados.
      * @param string $name
      * @param string $email
