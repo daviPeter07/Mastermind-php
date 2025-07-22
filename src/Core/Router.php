@@ -13,9 +13,10 @@ class Router {
     $this->routes["GET"][$uri] = $action;
   }
 
+  //verificação de existencia de rota, se nao existe = 404
   public function dispatch(){
-    $uri = $_SERVER["REQUEST_URI"];
-    $method = $_SERVER["REQUEST_METHOD"];
+    $uri = $_SERVER["REQUEST_URI"]; //api/register, api/login...
+    $method = $_SERVER["REQUEST_METHOD"]; //post, get, delete...
 
     if (isset($this->routes[$method][$uri])) {
       [$controllerClass, $controllerMethod] = $this->routes[$method][$uri];
