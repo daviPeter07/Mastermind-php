@@ -9,16 +9,15 @@ class AuthController
 {
     private AuthService $authService;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->authService = new AuthService();
     }
 
-    public function register()
-    {
+    public function register() {
+        //$data usado pra interpretação de arquivo json tanto para receber e retornar valores
         $data = json_decode(file_get_contents('php://input'), true);
 
-        // Validação dos dados
+        // Validação dos dados, caso nao haja os dados indicados retorna um http 400
         if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
             http_response_code(400);
             echo json_encode(['error' => 'Os campos name, email e password são obrigatórios.']);
@@ -26,6 +25,7 @@ class AuthController
         }
         
         try {
+            //controller valida os dados e cria o objeto enviando pra logica do service, se estiver tudo ok : 201
             $result = $this->authService->register($data['name'], $data['email'], $data['password']);
             http_response_code(201);
             echo json_encode($result);
