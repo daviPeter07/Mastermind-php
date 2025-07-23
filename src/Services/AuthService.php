@@ -8,9 +8,12 @@ use Exception;
 
 class AuthService {
   private PDO $db;
+  private JwtService $jwtService;
 
   public function __construct() {
     $this->db = Database::getConnection();
+    $this->jwtService = new JwtService();
+    //complementar token no response
   }
 
     /**
