@@ -73,4 +73,25 @@ class CategoryController
     http_response_code(200);
     echo json_encode($categories);
   }
+
+  public function update(int $id)
+  {
+    $userId = $this->getAuthenticatedUserId();
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    try {
+      $updatedCategory = $this->categoryService->update($id, $data, $userId);
+
+      if ($updatedCategory) {
+        http_response_code(200);
+        echo json_encode($updatedCategory);
+      } else {
+        http_response_code(404);
+        echo json_encode(['error' => 'Categoria não encontrada ou não pertence a você.']);
+      }
+    } catch (Exception $e) {
+      http_response_code(400);
+      echo json_encode(['error' => $e->getMessage()]);
+    }
+  }
 }

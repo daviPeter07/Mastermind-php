@@ -57,4 +57,40 @@ class CategoryService
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
+
+  /**
+   * Atualiza uma categoria de um usuário específico.
+   * @param int $id - O ID da categoria a ser atualizada.
+   * @param array $data - Os novos dados (ex: ['name' => 'Novo Nome']).
+   * @param string $userId - O ID do usuário logado.
+   * @return array|null - A categoria atualizada ou null se não for encontrada/permitida.
+   */
+  public function update(int $id, array $data, string $userId): ?array
+  {
+    $fields = [];
+    foreach (array_keys($data) as $field) {
+      $fields[] = "$field = ?";
+    }
+    $setClause = implode(', ', $fields);
+
+    if (empty($setClause)) {
+      throw new Exception("Nenhum dado fornecido para atualização.");
+    }
+
+    //usuario só pode editar uma categoria que pertence a ele.
+    $sql = "UPDATE categories SET $setClause WHERE id = ? AND user_id = ?";
+
+    $stmt = $this->db->prepare($sql);
+
+    $values = array_values($data);
+    $values[] = $id;
+    $values[] = $userId;
+    $stmt->execute($values);
+
+    $stmt = $this->db->prepare("SELECT id, name, type FROM categories WHERE id = ? AND user_id = ?");
+    $stmt->execute([$id, $userId]);
+    $updatedCategory = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $updatedCategory ?: null;
+  }
 }
