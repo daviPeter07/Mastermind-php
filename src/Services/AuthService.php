@@ -58,11 +58,14 @@ class AuthService {
      public function login(string $email, string $password): array {
       $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
       $stmt->execute([$email]);
-
       $user = $stmt->fetch(PDO::FETCH_ASSOC);
-      $isPassword = password_verify($password, $user["password"]);
 
-      if (!$user || !$isPassword) {
+      if (!$user) {
+        throw new Exception("Email ou senha inválidos");
+      }
+      
+      $isPassword = password_verify($password, $user["password"]);
+      if (!$isPassword) {
         throw new Exception("Email ou senha inválidos");
       }
 

@@ -74,7 +74,7 @@ class CategoryController
     echo json_encode($categories);
   }
 
-  public function show(int $id)
+  public function show(string $id)
   {
     $userId = $this->getAuthenticatedUserId();
 
@@ -89,7 +89,7 @@ class CategoryController
     }
   }
 
-  public function update(int $id)
+  public function update(string $id)
   {
     $userId = $this->getAuthenticatedUserId();
     $data = json_decode(file_get_contents('php://input'), true);
@@ -110,7 +110,7 @@ class CategoryController
     }
   }
 
-  public function delete(int $id)
+  public function delete(string $id)
   {
     $userId = $this->getAuthenticatedUserId();
 
