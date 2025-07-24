@@ -16,13 +16,6 @@ class CategoryService
     $this->db = Database::getConnection();
   }
 
-  /**
-   * Cria uma nova categoria para um usuário específico.
-   * @param array $data
-   * @param string $userId
-   * @return array
-   * @throws Exception
-   */
   public function create(array $data, string $userId): array
   {
     //verifica se o usuário já tem uma categoria com o mesmo nome.
@@ -42,11 +35,6 @@ class CategoryService
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  /**
-   * Busca todas as categorias de um usuário específico.
-   * @param string $userId - O ID do usuário logado.
-   * @return array - Uma lista de categorias.
-   */
   public function findByUser(string $userId): array
   {
     //Busca apenas as categorias que pertencem ao usuário logado.
@@ -58,13 +46,6 @@ class CategoryService
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  /**
-   * Atualiza uma categoria de um usuário específico.
-   * @param int $id - O ID da categoria a ser atualizada.
-   * @param array $data - Os novos dados (ex: ['name' => 'Novo Nome']).
-   * @param string $userId - O ID do usuário logado.
-   * @return array|null - A categoria atualizada ou null se não for encontrada/permitida.
-   */
   public function update(int $id, array $data, string $userId): ?array
   {
     $fields = [];
@@ -92,5 +73,14 @@ class CategoryService
     $updatedCategory = $stmt->fetch(PDO::FETCH_ASSOC);
 
     return $updatedCategory ?: null;
+  }
+
+  public function delete(int $id, string $userId): bool
+  {
+    $stmt = $this->db->prepare("DELETE FROM categories WHERE id = ? AND user_id = ?");
+    $stmt->execute([$id, $userId]);
+
+    //Se for > 0, significa que a categoria foi encontrada e deletada.
+    return $stmt->rowCount() > 0;
   }
 }

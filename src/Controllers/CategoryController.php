@@ -94,4 +94,18 @@ class CategoryController
       echo json_encode(['error' => $e->getMessage()]);
     }
   }
+
+  public function delete(int $id)
+  {
+    $userId = $this->getAuthenticatedUserId();
+
+    $wasDeleted = $this->categoryService->delete($id, $userId);
+
+    if ($wasDeleted) {
+      http_response_code(204);
+    } else {
+      http_response_code(404);
+      echo json_encode(['error' => 'Categoria não encontrada ou não pertence a você.']);
+    }
+  }
 }
