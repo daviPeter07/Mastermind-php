@@ -60,28 +60,7 @@ class UserController
 
   public function show(string $id)
   {
-    $authHeader = $_SERVER["HTTP_AUTHORIZATION"] ?? null;
-
-    if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
-      http_response_code(401);
-      echo json_encode(["error" => "Token inválido"]);
-      return;
-    }
-
-    $token = $matches[1];
-    $payload = $this->jwtService->verifyToken($token);
-
-    if (!$payload) {
-      http_response_code(401);
-      echo json_encode(["error" => "Token inválido ou expirado"]);
-      return;
-    }
-
-    if ($payload->role !== 'ADMIN') {
-      http_response_code(403);
-      echo json_encode(['error' => 'Acesso negado. Permissões de administrador necessárias.']);
-      return;
-    }
+    $this->authorizeAdmin();
 
     $user = $this->userService->getUserById($id);
 
@@ -94,28 +73,11 @@ class UserController
     }
   }
 
-  /**
-   * Lida com a requisição de ATUALIZAÇÃO de um usuário.
-   * @param string $id
-   */
   public function update(string $id)
   {
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
-    if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
-      http_response_code(401);
-      echo json_encode(['error' => 'Token inválido']);
-      return;
-    }
-    $payload = $this->jwtService->verifyToken($matches[1]);
-
-    if (!$payload || $payload->role !== 'ADMIN') {
-      http_response_code(403);
-      echo json_encode(['error' => 'Acesso negado. Permissões de administrador necessárias.']);
-      return;
-    }
+    $this->authorizeAdmin();
 
     $data = json_decode(file_get_contents('php://input'), true);
-
     $updatedUser = $this->userService->updateUser($id, $data);
 
     if ($updatedUser) {
@@ -127,27 +89,11 @@ class UserController
     }
   }
 
-  /**
-   * Lida com a requisição de DELEÇÃO de um usuário.
-   * @param string $id
-   */
   public function delete(string $id)
   {
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
-    if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
-      http_response_code(401);
-      echo json_encode(['error' => 'Token inválido']);
-      return;
-    }
-    $payload = $this->jwtService->verifyToken($matches[1]);
-    if (!$payload || $payload->role !== 'ADMIN') {
-      http_response_code(403);
-      echo json_encode(['error' => 'Acesso negado. Permissões de administrador necessárias.']);
-      return;
-    }
+    $this->authorizeAdmin();
 
     $this->userService->deleteUser($id);
     http_response_code(204);
-    echo json_encode(['message' => 'Usuário deletado com sucesso']);
   }
 }
