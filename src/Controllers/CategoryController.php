@@ -74,6 +74,21 @@ class CategoryController
     echo json_encode($categories);
   }
 
+  public function show(int $id)
+  {
+    $userId = $this->getAuthenticatedUserId();
+
+    $category = $this->categoryService->findById($id, $userId);
+
+    if ($category) {
+      http_response_code(200);
+      echo json_encode($category);
+    } else {
+      http_response_code(404);
+      echo json_encode(['error' => 'Categoria não encontrada ou não pertence a você.']);
+    }
+  }
+
   public function update(int $id)
   {
     $userId = $this->getAuthenticatedUserId();

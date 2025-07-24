@@ -46,6 +46,19 @@ class CategoryService
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  public function findById(int $id, string $userId): ?array
+  {
+    // A query busca pelo ID da categoria E pelo ID do usuário.
+    $stmt = $this->db->prepare(
+      "SELECT id, name, type, created_at FROM categories WHERE id = ? AND user_id = ?"
+    );
+    $stmt->execute([$id, $userId]);
+
+    $category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $category ?: null;
+  }
+
   public function update(int $id, array $data, string $userId): ?array
   {
     $fields = [];
