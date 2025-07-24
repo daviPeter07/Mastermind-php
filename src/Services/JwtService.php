@@ -11,6 +11,7 @@ class JwtService {
   private string $algorithm = "HS256";
   public function __construct() {
     $this->secretkey = getenv("JWT_SECRET");
+    //validação de token
     if (!$this->secretkey) {
       throw new Exception("Token inválido");
     }
@@ -34,6 +35,6 @@ class JwtService {
         "role" => $userRole
       ];
 
-      return JWT::encode($payload, $this->algorithm, $this->secretkey);
+      return JWT::encode($payload, $this->secretkey, $this->algorithm);
    }
 }

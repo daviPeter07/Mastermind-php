@@ -13,17 +13,7 @@ class AuthService {
   public function __construct() {
     $this->db = Database::getConnection();
     $this->jwtService = new JwtService();
-    //complementar token no response
   }
-
-    /**
-     * Registra um novo usuário no banco de dados.
-     * @param string $name
-     * @param string $email
-     * @param string $password
-     * @return array
-     * @throws Exception
-     */
 
      public function register(string $name, string $email, string $password): array {
       $stmt = $this->db->prepare("SELECT id FROM users WHERE email = ?");
@@ -35,9 +25,27 @@ class AuthService {
       }
       //encripta a senha
       $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-      $stmt = $this->db->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+      $stmt = $this->db->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?) RETURNING id, role");
       $stmt->execute([$name, $email, $hashedPassword]);
+      
+      $newUser = $stmt->fetch(PDO::FETCH_ASSOC);
+      if (!$newUser) {
+        throw new Exception("Falha ao criar usuário");
+      }
 
-      return ["message" => "Usuário cadastrado com sucesso"];
+      $token = $this->jwtService->generateToken($newUser["id"], $newUser["role"]);
+
+      $response = [
+        "user" => [
+          "id" => $newUser["id"],
+          "name" => $name,
+          "email" => $email,
+        ],
+        "token" => $token
+      ];
+
+      return $response;
      }
+
+     //login depois
 }
