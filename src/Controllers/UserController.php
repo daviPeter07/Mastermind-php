@@ -88,7 +88,7 @@ class UserController {
      * Lida com a requisição de ATUALIZAÇÃO de um usuário.
      * @param string $id
      */
-    public function update(string $id) {
+  public function update(string $id) {
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
         if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
           http_response_code(401);
@@ -114,5 +114,26 @@ class UserController {
             http_response_code(404);
             echo json_encode(['error' => 'Usuário não encontrado.']);
         }
-    }
+  }
+
+  /**
+     * Lida com a requisição de DELEÇÃO de um usuário.
+     * @param string $id
+     */
+  public function delete(string $id) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+        if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+          http_response_code(401);
+          echo json_encode(['error'=> 'Token inválido']);
+           return; }
+        $payload = $this->jwtService->verifyToken($matches[1]);
+        if (!$payload || $payload->role !== 'ADMIN') {
+           http_response_code(403);
+           echo json_encode(['error'=> 'Acesso negado. Permissões de administrador necessárias.']);
+           return; }
+
+        $this->userService->deleteUser($id);
+        http_response_code(204);
+        echo json_encode(['error'=> 'Usuário deletado com sucesso']);
+  }
   }

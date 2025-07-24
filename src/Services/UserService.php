@@ -39,7 +39,7 @@ class UserService {
      * @param array $data - Dados para atualizar (ex: ['name' => 'Novo Nome']).
      * @return array|null - O usuário atualizado ou null se não for encontrado.
      */
-    public function updateUser(string $id, array $data): ?array {
+  public function updateUser(string $id, array $data): ?array {
         $fields = [];
         foreach (array_keys($data) as $field) {
             $fields[] = "$field = ?";
@@ -53,5 +53,15 @@ class UserService {
         $stmt->execute($values);
 
         return $this->getUserById($id);
-    }
+  }
+
+  /**
+     * Deleta um usuário do banco de dados.
+     * @param string $id - ID do usuário a ser deletado.
+     * @return bool - True se a deleção foi bem-sucedida.
+     */
+  public function deleteUser(string $id): bool {
+        $stmt = $this->db->prepare("DELETE FROM users WHERE id = ?");
+        return $stmt->execute([$id]);
+  }
 }
