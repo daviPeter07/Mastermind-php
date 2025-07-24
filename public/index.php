@@ -11,6 +11,7 @@ $dotenv->load();
 use App\Core\Router;
 use App\Controllers\AuthController;
 use App\Controllers\UserController;
+use App\Controllers\CategoryController;
 
 //res : json
 header('Content-Type: application/json');
@@ -27,5 +28,10 @@ $router->get('/api/users', [UserController::class, 'index']);
 $router->get('/api/users/{id}', [UserController::class, 'show']);
 $router->put('/api/users/{id}', [UserController::class, 'update']);
 $router->delete('/api/users/{id}', [UserController::class, 'delete']);
+
+//Categories
+$router->post('/api/categories', [CategoryController::class,'create']);
+$router->get('/api/categories', [CategoryController::class,'index']);
+
 
 $router->dispatch();  
