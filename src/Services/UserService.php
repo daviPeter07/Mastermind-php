@@ -32,4 +32,27 @@ class UserService {
 
     return $user ?: null;
   }
+
+  /**
+     * Atualiza os dados de um usuário.
+     * @param string $id - ID do usuário a ser atualizado.
+     * @param array $data - Dados para atualizar (ex: ['name' => 'Novo Nome']).
+     * @return array|null - O usuário atualizado ou null se não for encontrado.
+     */
+    public function updateUser(string $id, array $data): ?array
+    {
+        $fields = [];
+        foreach (array_keys($data) as $field) {
+            $fields[] = "$field = ?";
+        }
+        $setClause = implode(', ', $fields);
+
+        $stmt = $this->db->prepare("UPDATE users SET $setClause WHERE id = ?");
+        
+        $values = array_values($data);
+        $values[] = $id;
+        $stmt->execute($values);
+
+        return $this->getUserById($id);
+    }
 }
