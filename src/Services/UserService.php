@@ -18,7 +18,7 @@ class UserService {
      */
 
   public function getUsers(): array {
-    $stmt = $this->db->prepare("SELECT id, name, email, role, created_at FROM users ORDER BY create_at DESC");
+    $stmt = $this->db->prepare("SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC");
     $stmt->execute();
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);

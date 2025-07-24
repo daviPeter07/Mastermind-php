@@ -34,4 +34,23 @@ class AuthController
             echo json_encode(['Error' => $e->getMessage()]);
         }
     }
+
+    public function login() {
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        if (empty($data["email"]) || empty($data["password"])) {
+            http_response_code(400);
+            echo json_encode(["error" => "Email ou senha são obrigatórios"]);
+            return;
+        }
+
+        try {
+            $result = $this->authService->login($data["email"], $data["password"]);
+            http_response_code(201);
+            echo json_encode($result);
+        } catch (Exception $e) {
+            http_response_code(401);
+            echo json_encode(["Error"=> $e->getMessage()]);
+        }
+    }
 }

@@ -18,9 +18,9 @@ class UserController {
   public function index() {
     $authHeader = $_SERVER["HTTP_AUTHORIZATION"] ?? null;
 
-      if (!$authHeader || preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+      if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
         http_response_code(401);
-        echo json_encode(["error" => "Token inexistente"]);
+        echo json_encode(["error" => "Token inválido"]);
         return;
       }
 

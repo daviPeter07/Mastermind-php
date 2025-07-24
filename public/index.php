@@ -17,6 +17,11 @@ header('Content-Type: application/json');
 
 $router = new Router();
 //rotas e requisições
+
+//autentificação
 $router->post('/api/register', [AuthController::class, 'register']);
+$router->post('/api/login', [AuthController::class, 'login']);
+
+
 $router->get('/api/users', [UserController::class, 'index']);
 $router->dispatch();  

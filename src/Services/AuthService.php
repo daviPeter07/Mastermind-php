@@ -47,5 +47,36 @@ class AuthService {
       return $response;
      }
 
-     //login depois
+     /**
+     * Autentica um usuário e retorna um token JWT.
+     * @param string $email
+     * @param string $password
+     * @return array
+     * @throws Exception
+     */
+
+     public function login(string $email, string $password): array {
+      $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
+      $stmt->execute([$email]);
+
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+      $isPassword = password_verify($password, $user["password"]);
+
+      if (!$user || !$isPassword) {
+        throw new Exception("Email ou senha inválidos");
+      }
+
+      $token = $this->jwtService->generateToken($user["id"], $user["role"]);
+
+      $response = [
+        "token" => $token,
+        'user' => [
+            'id' => $user['id'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'role' => $user['role']
+          ]
+      ];
+      return $response;
+     }
 }
