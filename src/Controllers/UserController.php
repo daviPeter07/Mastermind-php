@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Services\JwtService;
+use App\Services\UserService;
+use Exception;
+
+class UserController {
+
+  private UserService $userService;
+  private JwtService $jwtService;
+  public function __construct() {
+    $this->userService = new UserService();
+    $this->jwtService = new JwtService();
+  }
+
+  public function index() {
+    $authHeader = $_SERVER["HTTP_AUTHORIZATION"] ?? null;
+
+      if (!$authHeader || preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+        http_response_code(401);
+        echo json_encode(["error" => "Token inexistente"]);
+        return;
+      }
+
+      $token = $matches[1];
+      $payload = $this->jwtService->verifyToken($token);
+
+      if (!$payload) {
+        http_response_code(401);
+        echo json_encode(["error"=> "Token inválido ou expirado"]);
+        return;
+      }
+
+      if ($payload->role !== 'ADMIN') {
+              http_response_code(403);
+              echo json_encode(['error' => 'Acesso negado. Permissões de administrador necessárias.']);
+              return;
+      }
+
+      $users = $this->userService->getUsers();
+      http_response_code(200);
+      echo json_encode($users);
+  }
+}
