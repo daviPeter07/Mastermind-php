@@ -22,7 +22,10 @@ $router = new Router();
 $router->post('/api/register', [AuthController::class, 'register']);
 $router->post('/api/login', [AuthController::class, 'login']);
 
-
+//get
 $router->get('/api/users', [UserController::class, 'index']);
 $router->get('/api/users/{id}', [UserController::class, 'show']);
+
+$router->put('/api/users/{id}', [UserController::class, 'update']);
+
 $router->dispatch();  

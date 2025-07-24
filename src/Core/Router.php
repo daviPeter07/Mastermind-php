@@ -15,6 +15,11 @@ class Router {
     $this->routes["GET"][$uri] = $action;
   }
 
+  public function put(string $uri, array $action) {
+        $uri = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-fA-F0-9-]+)', $uri);
+        $this->routes['PUT'][$uri] = $action;
+    }
+
   //verificação de existencia de rota, se nao existe = 404
   public function dispatch(){
     $uri = $_SERVER["REQUEST_URI"]; //api/register, api/login...

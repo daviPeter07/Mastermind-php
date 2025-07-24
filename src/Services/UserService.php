@@ -39,8 +39,7 @@ class UserService {
      * @param array $data - Dados para atualizar (ex: ['name' => 'Novo Nome']).
      * @return array|null - O usuário atualizado ou null se não for encontrado.
      */
-    public function updateUser(string $id, array $data): ?array
-    {
+    public function updateUser(string $id, array $data): ?array {
         $fields = [];
         foreach (array_keys($data) as $field) {
             $fields[] = "$field = ?";

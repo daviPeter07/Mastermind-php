@@ -19,7 +19,7 @@ class UserController {
     $authHeader = $_SERVER["HTTP_AUTHORIZATION"] ?? null;
 
       if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
-        http_response_code(401);
+        http_response_code(403);
         echo json_encode(["error" => "Token inválido"]);
         return;
       }
@@ -83,4 +83,36 @@ class UserController {
         echo json_encode(['error'=> 'Usuário não encontrado']);
       }
   }
+
+  /**
+     * Lida com a requisição de ATUALIZAÇÃO de um usuário.
+     * @param string $id
+     */
+    public function update(string $id) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+        if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+          http_response_code(401);
+          echo json_encode(['error'=> 'Token inválido']);
+          return; 
+        }
+        $payload = $this->jwtService->verifyToken($matches[1]);
+
+        if (!$payload || $payload->role !== 'ADMIN') { 
+          http_response_code(403);
+          echo json_encode(['error'=> 'Acesso negado. Permissões de administrador necessárias.']);
+          return; 
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $updatedUser = $this->userService->updateUser($id, $data);
+
+        if ($updatedUser) {
+            http_response_code(200);
+            echo json_encode($updatedUser);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Usuário não encontrado.']);
+        }
+    }
   }
