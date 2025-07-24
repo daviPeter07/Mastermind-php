@@ -24,5 +24,5 @@ $router->post('/api/login', [AuthController::class, 'login']);
 
 
 $router->get('/api/users', [UserController::class, 'index']);
-$router->get('/api/users/id', [UserController::class, 'index']);
+$router->get('/api/users/{id}', [UserController::class, 'show']);
 $router->dispatch();  
