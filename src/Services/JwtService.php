@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Exception;
+use stdClass;
 
 class JwtService {
 
@@ -36,5 +38,20 @@ class JwtService {
       ];
 
       return JWT::encode($payload, $this->secretkey, $this->algorithm);
+   }
+
+   /**
+     * Verifica um token JWT e retorna seu payload se for válido.
+     * @param string $token
+     * @return stdClass|null
+     */
+
+   public function verifyToken(string $token): ?stdClass {
+      try {
+        $decoded = JWT::decode($token, new Key($this->secretkey, $this->algorithm));
+        return $decoded;
+      } catch(Exception $e) {
+        return null;
+      }
    }
 }
