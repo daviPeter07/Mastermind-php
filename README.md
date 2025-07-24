@@ -36,8 +36,8 @@ Siga os passos abaixo para configurar e rodar o ambiente de desenvolvimento loca
 
 1.  **Clone o Repositório**
     ```bash
-    git clone [URL_DO_SEU_REPOSITORIO]
-    cd mastermind-php
+    git clone https://github.com/daviPeter07/Mastermind-php
+    cd Mastermind-php
     ```
 
 2.  **Configure as Variáveis de Ambiente**
