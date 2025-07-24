@@ -23,4 +23,13 @@ class UserService {
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
+
+  public function getUserById(string $id): ?array {
+    $stmt = $this->db->prepare("SELECT id, name, email, role FROM users WHERE id = ?");
+    $stmt->execute([$id]);
+
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $user ?: null;
+  }
 }
