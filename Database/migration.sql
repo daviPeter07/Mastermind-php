@@ -36,3 +36,26 @@ CREATE TABLE categories (
     -- Garante que um usuário não pode ter duas categorias com o mesmo nome
     UNIQUE (user_id, name)
 );
+
+CREATE TABLE tasks (
+    id SERIAL PRIMARY KEY,
+    content TEXT NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'PENDENTE' CHECK (status IN ('PENDENTE', 'CONCLUIDA')),
+    due_date TIMESTAMP WITH TIME ZONE,
+
+    user_id UUID NOT NULL,
+    category_id INT NOT NULL,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_user
+        FOREIGN KEY(user_id) 
+        REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_category
+        FOREIGN KEY(category_id) 
+        REFERENCES categories(id)
+        ON DELETE CASCADE
+);
