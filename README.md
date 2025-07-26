@@ -182,5 +182,97 @@ Lista todos os usuários do sistema. Requer um token de um usuário com `role` d
         "error": "Acesso negado. Permissões de administrador necessárias."
     }
     ```
+    * **Resposta de Erro (404 Not Found):** Se a categoria não existir ou não pertencer ao usuário.
+
+#### `PUT /api/categories/{id}`
+Atualiza o nome de uma categoria.
+
+* **Body (JSON):**
+    ```json
+    {
+        "name": "Estudos da Faculdade"
+    }
+    ```
+* **Resposta de Sucesso (200 OK):** Retorna o objeto da categoria com os dados atualizados.
+
+#### `DELETE /api/categories/{id}`
+Deleta uma categoria do usuário.
+
+* **Resposta de Sucesso (204 No Content):** A resposta não terá corpo.
+
+### Tarefas 🔐
+
+#### `POST /api/tasks`
+Cria uma nova tarefa para o usuário autenticado.
+
+* **Body (JSON):**
+    ```json
+    {
+        "content": "Finalizar o CRUD de Tarefas",
+        "category_id": 1,
+        "due_date": "2025-12-31 23:59:59"
+    }
+    ```
+* **Resposta de Sucesso (201 Created):** Retorna a tarefa recém-criada.
+
+#### `GET /api/tasks`
+Lista todas as tarefas do usuário autenticado.
+
+#### `GET /api/tasks/{id}`
+Busca uma tarefa específica do usuário pelo ID.
+
+#### `PUT /api/tasks/{id}`
+Atualiza os dados de uma tarefa.
+
+* **Body (JSON):**
+    ```json
+    {
+        "content": "Apresentar o CRUD de Tarefas para o time",
+        "status": "CONCLUIDA",
+        "category_id": 2
+    }
+    ```
+
+#### `PATCH /api/tasks/{id}/status`
+Atualiza apenas o status de uma tarefa.
+
+* **Body (JSON):**
+    ```json
+    {
+        "status": "CONCLUIDA"
+    }
+    ```
+
+#### `DELETE /api/tasks/{id}`
+Deleta uma tarefa do usuário.
+
+* **Resposta de Sucesso (204 No Content):** A resposta não terá corpo.
+
+#### `GET /api/categories/{id}/tasks`
+Lista todas as tarefas de uma categoria específica do usuário.
+
+### Usuários (Requer Role de ADMIN 🔐)
+
+#### `GET /api/users`
+Lista todos os usuários do sistema.
+
+#### `GET /api/users/{id}`
+Busca um usuário específico pelo ID.
+
+#### `PUT /api/users/{id}`
+Atualiza os dados de um usuário (ex: `name`, `email`, `role`).
+
+* **Body (JSON):**
+    ```json
+    {
+        "name": "Alice Admin",
+        "role": "ADMIN"
+    }
+    ```
+
+#### `DELETE /api/users/{id}`
+Deleta um usuário do sistema.
+
+* **Resposta de Sucesso (204 No Content):** A resposta não terá corpo.
 
 *(CRUDs de `User` e `Category` para `GET por ID`, `PUT` e `DELETE` seguem um padrão similar).*
