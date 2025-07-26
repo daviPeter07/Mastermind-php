@@ -24,6 +24,11 @@ class Router {
     $uri = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-fA-F0-9-]+)', $uri);
     $this->routes['DELETE'][$uri] = $action;
   }
+
+  public function patch(string $uri, array $action) {
+    $uri = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[a-fA-F0-9-]+)', $uri);
+    $this->routes['PATCH'][$uri] = $action;
+  }
   
   //verificação de existencia de rota, se nao existe = 404
   public function dispatch(){

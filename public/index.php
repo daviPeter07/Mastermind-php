@@ -12,6 +12,7 @@ use App\Core\Router;
 use App\Controllers\AuthController;
 use App\Controllers\UserController;
 use App\Controllers\CategoryController;
+use App\Controllers\TaskController;
 
 //res : json
 header('Content-Type: application/json');
@@ -35,6 +36,15 @@ $router->get('/api/categories', [CategoryController::class, 'index']);
 $router->get('/api/categories/{id}', [CategoryController::class, 'show']);
 $router->put('/api/categories/{id}', [CategoryController::class, 'update']);
 $router->delete('/api/categories/{id}', [CategoryController::class, 'delete']);
+
+//Tasks
+$router->post('/api/tasks', [TaskController::class, 'create']);
+$router->get('/api/tasks', [TaskController::class, 'index']);
+$router->get('/api/tasks/{id}', [TaskController::class, 'show']);
+$router->put('/api/tasks/{id}', [TaskController::class, 'update']);
+$router->delete('/api/tasks/{id}', [TaskController::class, 'delete']);
+$router->get('/api/categories/{id}/tasks', [TaskController::class, 'findByCategory']);
+$router->patch('/api/tasks/{id}/status', [TaskController::class, 'updateStatus']);
 
 
 $router->dispatch();  
