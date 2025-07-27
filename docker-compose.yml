@@ -30,6 +30,15 @@ services:
     volumes:
       - postgres_php_data:/var/lib/postgresql/data
       - ./Database/migration.sql:/docker-entrypoint-initdb.d/init.sql
-
+  bot:
+    build: .
+    container_name: mastermind_php_bot
+    restart: always
+    command: php bot-listener.php
+    depends_on:
+      - app
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - MASTERMIND_API_TOKEN=${MASTERMIND_API_TOKEN}
 volumes:
   postgres_php_data:
