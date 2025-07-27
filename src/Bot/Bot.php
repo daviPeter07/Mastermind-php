@@ -22,13 +22,12 @@ class Bot
     $this->commandHandler = new CommandHandler();
   }
 
-  public function listen(int $maxIterations = 100)
+  public function listen()
   {
     echo "Bot Mastermind running...\n";
 
     $offset = 0;
-    $iterations = 0;
-    while ($iterations < $maxIterations) {
+    while (true) {
       $updates = $this->telegram->getUpdates($offset, 100, 30);
       foreach ($updates as $update) {
         $offset = $update->getUpdateId() + 1;
@@ -40,7 +39,6 @@ class Bot
       }
 
       sleep(1);
-      $iterations++;
     }
   }
 }
