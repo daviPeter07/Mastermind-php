@@ -10,7 +10,7 @@ CREATE TABLE users (
 
     telegram_chat_id VARCHAR(255) UNIQUE,
     bot_state VARCHAR(50),
-    api_token TEXT
+    api_token TEXT,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
