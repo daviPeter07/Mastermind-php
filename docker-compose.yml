@@ -34,7 +34,9 @@ services:
     build: .
     container_name: mastermind_php_bot
     restart: always
-    command: php bot-listener.php
+    command: php scripts/run-bot.php
+    volumes:
+      - .:/app
     depends_on:
       - app
     environment:

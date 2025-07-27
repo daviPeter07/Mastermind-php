@@ -8,6 +8,7 @@ use Exception;
 class Bot
 {
   private BotApi $telegram;
+  private CommandHandler $commandHandler;
 
   public function __construct()
   {
@@ -18,33 +19,28 @@ class Bot
     }
 
     $this->telegram = new BotApi($botToken);
-
+    $this->commandHandler = new CommandHandler();
   }
 
-  public function listen()
+  public function listen(int $maxIterations = 100)
   {
     echo "Bot Mastermind running...\n";
 
     $offset = 0;
-
-    // O loop infinito que busca mensagens
-    while (true) {
+    $iterations = 0;
+    while ($iterations < $maxIterations) {
       $updates = $this->telegram->getUpdates($offset, 100, 30);
-
       foreach ($updates as $update) {
         $offset = $update->getUpdateId() + 1;
         $message = $update->getMessage();
 
         if ($message) {
-          echo "Mensagem recebida de: " . $message->getChat()->getUsername() . "\n";
-          echo "Texto: " . $message->getText() . "\n\n";
-
-          // TODO: Futuramente, em vez de 'echo', vamos chamar o CommandHandler aqui:
-          // $this->commandHandler->handle($message, $this->telegram);
+          $this->commandHandler->handle($message, $this->telegram);
         }
       }
 
       sleep(1);
+      $iterations++;
     }
   }
 }
