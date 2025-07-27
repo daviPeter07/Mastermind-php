@@ -8,9 +8,7 @@ $dotenv->load();
 use App\Bot\Bot;
 
 try {
-    // Cria uma nova instância do nosso bot...
     $bot = new Bot();
-    // ...e o coloca para ouvir.
     $bot->listen();
     
 } catch (\Exception $e) {

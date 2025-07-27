@@ -81,4 +81,12 @@ class UserService
     $stmt = $this->db->prepare("UPDATE users SET telegram_chat_id = ?, bot_state = 'awaiting_password' WHERE email = ?");
     return $stmt->execute([$chatId, $email]);
   }
+
+  public function findByEmail(string $email): ?array
+  {
+    $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $user ?: null;
+  }
 }
