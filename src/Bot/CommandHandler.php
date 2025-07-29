@@ -7,6 +7,8 @@ use TelegramBot\Api\BotApi;
 use App\Services\UserService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 
 class CommandHandler
 {
@@ -17,7 +19,13 @@ class CommandHandler
     public function __construct()
     {
         $this->userService = new UserService();
-        $this->httpClient = new Client(['base_uri' => 'http://app:8000']);
+        $this->httpClient = new Client([
+            'base_uri' => 'http://app:8000',
+            'timeout' => 30, // Aumenta o timeout para 30 segundos
+            'connect_timeout' => 10, // Timeout específico para conexão
+            'retry_on_status' => [500, 502, 503, 504], // Retry em erros de servidor
+            'max_retry_attempts' => 3
+        ]);
     }
 
     public function handle(Message $message, BotApi $telegram)
@@ -50,7 +58,7 @@ class CommandHandler
 
             case '/login':
                 $this->sessions[$chatId] = ['state' => 'awaiting_login_email'];
-                $telegram->sendMessage($chatId, 'Para fazer login, por favor, digite o email da sua conta Mastermind:');
+                $telegram->sendMessage($chatId, 'Para fazer login, por favor, digite o email:');
                 break;
 
             case '/categorias':
@@ -86,13 +94,17 @@ class CommandHandler
         $email = $this->sessions[$chatId]['email'];
 
         try {
-            $response = $this->httpClient->post('/api/auth/login', [
-                'json' => ['email' => $email, 'password' => $password]
+            // Chama a nossa API de login
+            $response = $this->httpClient->post('/api/login', [
+                'json' => ['email' => $email, 'password' => $password],
+                'timeout' => 15 // Timeout específico para login
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true);
             $token = $data['token'];
             $userFromApi = $data['user'];
+
+            // Salva os dados permanentes no banco
             $this->userService->updateUser($userFromApi['id'], [
                 'api_token' => $token,
                 'telegram_chat_id' => $chatId,
@@ -100,8 +112,12 @@ class CommandHandler
             ]);
 
             $telegram->sendMessage($chatId, "✅ Login realizado com sucesso! Bem-vindo de volta, {$userFromApi['name']}.");
+        } catch (ConnectException $e) {
+            $telegram->sendMessage($chatId, "❌ Erro de conexão com a API. Verifique se o servidor está rodando.");
         } catch (ClientException $e) {
             $telegram->sendMessage($chatId, "❌ Email ou senha inválidos. Use /login para tentar novamente.");
+        } catch (RequestException $e) {
+            $telegram->sendMessage($chatId, "❌ Erro ao conectar com a API: " . $e->getMessage());
         } finally {
             unset($this->sessions[$chatId]);
         }
@@ -111,7 +127,8 @@ class CommandHandler
     {
         try {
             $response = $this->httpClient->get('/api/categories', [
-                'headers' => ['Authorization' => 'Bearer ' . $apiToken]
+                'headers' => ['Authorization' => 'Bearer ' . $apiToken],
+                'timeout' => 10
             ]);
             $categories = json_decode($response->getBody()->getContents(), true);
 
@@ -124,8 +141,12 @@ class CommandHandler
                 }
             }
             $telegram->sendMessage($chatId, $reply);
+        } catch (ConnectException $e) {
+            $telegram->sendMessage($chatId, '❌ Erro de conexão com a API. Verifique se o servidor está rodando.');
         } catch (ClientException $e) {
-            $telegram->sendMessage($chatId, 'Ocorreu um erro ao buscar suas categorias.');
+            $telegram->sendMessage($chatId, '❌ Erro ao buscar categorias. Verifique se seu token ainda é válido.');
+        } catch (RequestException $e) {
+            $telegram->sendMessage($chatId, '❌ Erro ao conectar com a API: ' . $e->getMessage());
         }
     }
 }

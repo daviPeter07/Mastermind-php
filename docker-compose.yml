@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -30,15 +28,17 @@ services:
     volumes:
       - postgres_php_data:/var/lib/postgresql/data
       - ./Database/migration.sql:/docker-entrypoint-initdb.d/init.sql
+
   bot:
     build: .
     container_name: mastermind_php_bot
     restart: always
-    command: php scripts/run-bot.php
+    command: bash scripts/start-bot.sh
     volumes:
       - .:/app
     depends_on:
       - app
+      - postgres
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - MASTERMIND_API_TOKEN=${MASTERMIND_API_TOKEN}
@@ -47,5 +47,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - DB_PORT=${DB_PORT}
       - JWT_SECRET=${JWT_SECRET}
+
 volumes:
   postgres_php_data:

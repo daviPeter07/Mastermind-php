@@ -9,6 +9,7 @@ API RESTful para o assistente pessoal Mastermind, construída com PHP moderno, P
 * **Autenticação Segura:** Sistema completo de registro e login utilizando hash de senhas (`bcrypt`) e Tokens de Acesso (`JWT`).
 * **Gerenciamento de Usuários:** CRUD completo para usuários com sistema de permissões (`Roles`) para `ADMIN` e `USER`.
 * **CRUD de Categorias:** Usuários autenticados podem gerenciar suas próprias categorias de tarefas e finanças.
+* **Bot do Telegram:** Bot integrado para interação via Telegram com comandos para login e visualização de categorias.
 * **Arquitetura em Camadas:** Código organizado com uma separação clara de responsabilidades (Router, Controllers, Services).
 
 ## 🛠️ Stack de Tecnologias
@@ -18,6 +19,7 @@ API RESTful para o assistente pessoal Mastermind, construída com PHP moderno, P
 * **Ambiente de Desenvolvimento:** Docker & Docker Compose
 * **Gerenciador de Pacotes:** Composer
 * **Autenticação:** `firebase/php-jwt` para JSON Web Tokens
+* **Bot do Telegram:** `telegram-bot/api` para integração com Telegram
 * **Variáveis de Ambiente:** `vlucas/phpdotenv`
 
 ---
@@ -31,6 +33,7 @@ Siga os passos abaixo para configurar e rodar o ambiente de desenvolvimento loca
 * [Docker](https://www.docker.com/products/docker-desktop/)
 * [Composer](https://getcomposer.org/)
 * PHP (necessário para o Composer, a versão não precisa ser a mesma do contêiner)
+* Token do Bot do Telegram (veja instruções em `ENV_SETUP.md`)
 
 ### Passos de Instalação
 
@@ -41,11 +44,16 @@ Siga os passos abaixo para configurar e rodar o ambiente de desenvolvimento loca
     ```
 
 2.  **Configure as Variáveis de Ambiente**
-    Copie o arquivo de exemplo `.env.example` para um novo arquivo chamado `.env`.
+    Crie um arquivo `.env` na raiz do projeto com as variáveis necessárias (veja `ENV_SETUP.md` para detalhes):
     ```bash
-    cp .env.example .env
+    # Exemplo de variáveis necessárias
+    POSTGRES_DB=mastermind_db
+    POSTGRES_USER=mastermind_user
+    POSTGRES_PASSWORD=minha_senha_segura_123
+    DB_PORT=5432
+    JWT_SECRET=chave_super_secreta_para_jwt_2024
+    TELEGRAM_BOT_TOKEN=seu_token_do_bot_aqui
     ```
-    Em seguida, abra o arquivo `.env` e preencha com suas chaves e senhas.
 
 3.  **Instale as Dependências do PHP**
     O Composer vai ler o `composer.json` e instalar as bibliotecas necessárias.
@@ -54,13 +62,31 @@ Siga os passos abaixo para configurar e rodar o ambiente de desenvolvimento loca
     ```
 
 4.  **Inicie o Ambiente Docker**
-    Este comando vai construir as imagens e iniciar os contêineres da API e do Banco de Dados.
+    Este comando vai construir as imagens e iniciar os contêineres da API, Banco de Dados e Bot.
     ```bash
     docker compose up --build -d
     ```
 
+Pronto! Sua API estará rodando em `http://localhost:8000` e o bot estará disponível no Telegram.
 
-Pronto! Sua API estará rodando em `http://localhost:8000`.
+---
+
+## 🤖 Bot do Telegram
+
+O bot do Telegram permite interagir com a API através de comandos simples:
+
+### Comandos Disponíveis
+
+* `/start` - Inicia o bot e mostra mensagem de boas-vindas
+* `/login` - Inicia o processo de login na API
+* `/categorias` - Lista todas as categorias do usuário logado
+* `/status` - Verifica se a API está funcionando
+
+### Como usar
+
+1. Configure o `TELEGRAM_BOT_TOKEN` no arquivo `.env`
+2. Inicie os containers com `docker compose up -d`
+3. Procure seu bot no Telegram e envie `/start`
 
 ---
 

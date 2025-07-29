@@ -9,8 +9,11 @@ use App\Bot\Bot;
 
 try {
     $bot = new Bot();
+    echo "🚀 Iniciando o bot...\n";
     $bot->listen();
     
 } catch (\Exception $e) {
     echo "Erro ao iniciar o bot: " . $e->getMessage() . "\n";
+    echo "Stack trace:\n" . $e->getTraceAsString() . "\n";
+    exit(1);
 }
