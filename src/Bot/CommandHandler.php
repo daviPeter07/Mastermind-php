@@ -17,6 +17,7 @@ class CommandHandler
     private array $commandMap = [
         '/start'           => [AuthCommands::class, 'start'],
         '/login'           => [AuthCommands::class, 'login'],
+        '/register'        => [AuthCommands::class, 'register'],
         '/categorias'      => [CategoryCommands::class, 'list'],
         '/add_categoria'   => [CategoryCommands::class, 'create'],
         '/edit_categoria'  => [CategoryCommands::class, 'update'],
@@ -44,7 +45,7 @@ class CommandHandler
 
         $state = $this->sessions[$chatId]['state'] ?? null;
 
-        if (str_starts_with($state, 'awaiting_login')) {
+        if ($state && str_starts_with($state, 'awaiting_login')) {
             $handler = new AuthCommands();
             if ($state === 'awaiting_login_email') {
                 $handler->handleLoginEmail($chatId, $text, $telegram, $this->sessions);
@@ -55,8 +56,22 @@ class CommandHandler
                 return;
             }
         }
+        if ($state && str_starts_with($state, 'awaiting_register')) {
+            if ($state === 'awaiting_register_name') {
+                $handler->handleRegisterName($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_register_email') {
+                $handler->handleRegisterEmail($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_register_password') {
+                $handler->handleRegisterPassword($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+        }
 
-        if (str_starts_with($state, 'awaiting_category')) {
+        if ($state && str_starts_with($state, 'awaiting_category')) {
             $handler = new CategoryCommands();
             if ($state === 'awaiting_category_name') {
                 $handler->handleCategoryName($chatId, $text, $telegram, $this->sessions);
@@ -84,7 +99,7 @@ class CommandHandler
             }
         }
 
-        if (str_starts_with($state, 'awaiting_task')) {
+        if ($state && str_starts_with($state, 'awaiting_task')) {
             $handler = new TaskCommands();
             if ($state === 'awaiting_task_content') {
                 $handler->handleTaskContent($chatId, $text, $telegram, $this->sessions, $user);
