@@ -7,6 +7,7 @@ use TelegramBot\Api\BotApi;
 use App\Services\UserService;
 use App\Bot\Commands\AuthCommands;
 use App\Bot\Commands\CategoryCommands;
+use App\Bot\Commands\TaskCommands;
 
 class CommandHandler
 {
@@ -14,12 +15,16 @@ class CommandHandler
     private array $sessions = [];
 
     private array $commandMap = [
-        '/start'      => [AuthCommands::class, 'start'],
-        '/login'      => [AuthCommands::class, 'login'],
-        '/categorias' => [CategoryCommands::class, 'list'],
+        '/start'           => [AuthCommands::class, 'start'],
+        '/login'           => [AuthCommands::class, 'login'],
+        '/categorias'      => [CategoryCommands::class, 'list'],
         '/add_categoria'   => [CategoryCommands::class, 'create'],
         '/edit_categoria'  => [CategoryCommands::class, 'update'],
         '/del_categoria'   => [CategoryCommands::class, 'delete'],
+        '/tarefas'         => [TaskCommands::class, 'list'],
+        '/add_tarefa'      => [TaskCommands::class, 'create'],
+        '/edit_tarefa'     => [TaskCommands::class, 'update'],
+        '/del_tarefa'      => [TaskCommands::class, 'delete'],
     ];
 
     public function __construct()
@@ -39,46 +44,92 @@ class CommandHandler
 
         $state = $this->sessions[$chatId]['state'] ?? null;
 
-        $authHandler = new AuthCommands();
-        if ($state === 'awaiting_login_email') {
-            $authHandler->handleLoginEmail($chatId, $text, $telegram, $this->sessions);
-            return;
-        }
-        if ($state === 'awaiting_login_password') {
-            $authHandler->handleLoginPassword($chatId, $text, $telegram, $this->sessions);
-            return;
+        if (str_starts_with($state, 'awaiting_login')) {
+            $handler = new AuthCommands();
+            if ($state === 'awaiting_login_email') {
+                $handler->handleLoginEmail($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_login_password') {
+                $handler->handleLoginPassword($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
         }
 
-        $categoryHandler = new CategoryCommands();
-        if ($state === 'awaiting_category_name') {
-            $categoryHandler->handleCategoryName($chatId, $text, $telegram, $this->sessions);
-            return;
+        if (str_starts_with($state, 'awaiting_category')) {
+            $handler = new CategoryCommands();
+            if ($state === 'awaiting_category_name') {
+                $handler->handleCategoryName($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_category_type') {
+                $handler->handleCategoryType($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_category_id_for_edit') {
+                $handler->handleCategoryIdForEdit($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_category_new_name') {
+                $handler->handleCategoryNewName($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_category_id_for_delete') {
+                $handler->handleCategoryIdForDelete($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_category_delete_confirmation') {
+                $handler->handleCategoryDeleteConfirmation($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
         }
-        if ($state === 'awaiting_category_type') {
-            $categoryHandler->handleCategoryType($chatId, $text, $telegram, $this->sessions);
-            return;
+
+        if (str_starts_with($state, 'awaiting_task')) {
+            $handler = new TaskCommands();
+            if ($state === 'awaiting_task_content') {
+                $handler->handleTaskContent($chatId, $text, $telegram, $this->sessions, $user);
+                return;
+            }
+            if ($state === 'awaiting_task_category_id') {
+                $handler->handleTaskCategoryId($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_task_due_date') {
+                $handler->handleTaskDueDate($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_task_id_for_edit') {
+                $handler->handleTaskIdForEdit($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_task_new_content') {
+                $handler->handleTaskNewContent($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_task_id_for_delete') {
+                $handler->handleTaskIdForDelete($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
+            if ($state === 'awaiting_task_delete_confirmation') {
+                $handler->handleTaskDeleteConfirmation($chatId, $text, $telegram, $this->sessions);
+                return;
+            }
         }
-        if ($state === 'awaiting_category_id_for_edit') {
-            $categoryHandler->handleCategoryIdForEdit($chatId, $text, $telegram, $this->sessions);
-            return;
-        }
-        if ($state === 'awaiting_category_new_name') {
-            $categoryHandler->handleCategoryNewName($chatId, $text, $telegram, $this->sessions);
-            return;
-        }
-        if ($state === 'awaiting_category_id_for_delete') {
-            $categoryHandler->handleCategoryIdForDelete($chatId, $text, $telegram, $this->sessions);
-            return;
-        }
-        if ($state === 'awaiting_category_delete_confirmation') {
-            $categoryHandler->handleCategoryDeleteConfirmation($chatId, $text, $telegram, $this->sessions);
+
+        // Comando com parâmetro: /done <id>
+        if (preg_match('/^\/done\s+(\d+)/', $text, $matches)) {
+            if ($user && $user['api_token']) {
+                (new TaskCommands())->done($message, $telegram, $user, $matches);
+            } else {
+                $telegram->sendMessage($chatId, 'Você precisa estar logado. Use /login.');
+            }
             return;
         }
 
         if (isset($this->commandMap[$text])) {
             [$commandClass, $method] = $this->commandMap[$text];
 
-            if (in_array($text, ['/login', '/add_categoria', '/edit_categoria', '/del_categoria'])) {
+            if (str_contains($text, 'add_') || str_contains($text, 'edit_') || str_contains($text, 'del_') || str_contains($text, 'login')) {
                 (new $commandClass())->$method($message, $telegram, $this->sessions, $user);
             } else {
                 (new $commandClass())->$method($message, $telegram, $user);
