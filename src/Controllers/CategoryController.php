@@ -17,11 +17,6 @@ class CategoryController
     $this->jwtService = new JwtService();
   }
 
-  /**
-   * Função privada de segurança.
-   * Verifica o token e retorna o ID do usuário (subject).
-   * @return string - O UUID do usuário logado.
-   */
   private function getAuthenticatedUserId(): string
   {
     $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
