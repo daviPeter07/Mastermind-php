@@ -14,6 +14,12 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - DB_PORT=${DB_PORT}
       - JWT_SECRET=${JWT_SECRET}
+    healthcheck:
+      test: ["CMD", "php", "-r", "echo 'API OK';"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   postgres:
     image: postgres:15
@@ -28,17 +34,24 @@ services:
     volumes:
       - postgres_php_data:/var/lib/postgresql/data
       - ./Database/migration.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   bot:
     build: .
     container_name: mastermind_php_bot
     restart: always
-    command: bash scripts/start-bot.sh
+    command: php scripts/run-bot.php
     volumes:
       - .:/app
     depends_on:
-      - app
-      - postgres
+      app:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - MASTERMIND_API_TOKEN=${MASTERMIND_API_TOKEN}
@@ -47,6 +60,12 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - DB_PORT=${DB_PORT}
       - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - default
 
 volumes:
   postgres_php_data:
+
+networks:
+  default:
+    driver: bridge
