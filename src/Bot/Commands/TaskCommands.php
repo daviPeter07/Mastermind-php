@@ -36,12 +36,13 @@ class TaskCommands
         $reply = "Suas tarefas:\n\n";
         foreach ($tasks as $task) {
           $statusEmoji = $task['status'] === 'CONCLUIDA' ? '✅' : '📝';
-          $reply .= "{$statusEmoji} *{$task['content']}*\n";
-          $reply .= "   - ID: `{$task['id']}`\n";
+          $content = htmlspecialchars($task['content'], ENT_QUOTES, 'UTF-8');
+          $reply .= "{$statusEmoji} {$content}\n";
+          $reply .= "   - ID: {$task['id']}\n";
           $reply .= "   - Categoria: {$task['category_name']}\n\n";
         }
       }
-      $telegram->sendMessage($chatId, $reply, 'Markdown');
+      $telegram->sendMessage($chatId, $reply);
     } catch (ClientException $e) {
       $telegram->sendMessage($chatId, 'Ocorreu um erro ao buscar suas tarefas.');
     }
@@ -81,9 +82,9 @@ class TaskCommands
         'headers' => ['Authorization' => 'Bearer ' . $apiToken],
         'json' => ['status' => 'CONCLUIDA']
       ]);
-      $telegram->sendMessage($chatId, "✅ Tarefa de ID `{$taskId}` marcada como concluída!", 'Markdown');
+      $telegram->sendMessage($chatId, "✅ Tarefa de ID {$taskId} marcada como concluída!");
     } catch (ClientException $e) {
-      $telegram->sendMessage($chatId, "❌ Erro ao atualizar tarefa. Verifique se o ID `{$taskId}` é válido e pertence a você.", 'Markdown');
+      $telegram->sendMessage($chatId, "❌ Erro ao atualizar tarefa. Verifique se o ID {$taskId} é válido e pertence a você.");
     }
   }
 
