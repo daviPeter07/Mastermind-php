@@ -7,7 +7,6 @@ use TelegramBot\Api\BotApi;
 use App\Services\UserService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use Exception;
 
 class AuthCommands
 {
@@ -134,6 +133,28 @@ class AuthCommands
             $telegram->sendMessage($chatId, "❌ Erro: " . ($errorBody['error'] ?? 'Não foi possível criar sua conta.') . " Tente /register novamente.");
         } finally {
             unset($sessions[$chatId]);
+        }
+    }
+
+    public function logout(Message $message, BotApi $telegram, ?array $user)
+    {
+        $chatId = (string) $message->getChat()->getId();
+
+        if (!$user || !$user['api_token']) {
+            $telegram->sendMessage($chatId, "Você não está logado. Use /login para fazer login.");
+            return;
+        }
+
+        try {
+            // Limpar o token no banco de dados
+            $this->userService->updateUser($user['id'], [
+                'api_token' => null,
+                'bot_state' => 'unauthenticated'
+            ]);
+
+            $telegram->sendMessage($chatId, "✅ Logout realizado com sucesso! Use /login para fazer login novamente.");
+        } catch (\Exception $e) {
+            $telegram->sendMessage($chatId, "❌ Erro ao fazer logout. Tente novamente.");
         }
     }
 }

@@ -18,6 +18,7 @@ class CommandHandler
         '/start'           => [AuthCommands::class, 'start'],
         '/login'           => [AuthCommands::class, 'login'],
         '/register'        => [AuthCommands::class, 'register'],
+        '/logout'          => [AuthCommands::class, 'logout'],
         '/categorias'      => [CategoryCommands::class, 'list'],
         '/add_categoria'   => [CategoryCommands::class, 'create'],
         '/edit_categoria'  => [CategoryCommands::class, 'update'],
@@ -147,7 +148,16 @@ class CommandHandler
             if (str_contains($text, 'add_') || str_contains($text, 'edit_') || str_contains($text, 'del_') || str_contains($text, 'login')) {
                 (new $commandClass())->$method($message, $telegram, $this->sessions, $user);
             } else {
-                (new $commandClass())->$method($message, $telegram, $user);
+                // Validação para logout - requer autenticação
+                if ($text === '/logout') {
+                    if ($user && $user['api_token']) {
+                        (new $commandClass())->$method($message, $telegram, $user);
+                    } else {
+                        $telegram->sendMessage($chatId, 'Você não está logado. Use /login para fazer login.');
+                    }
+                } else {
+                    (new $commandClass())->$method($message, $telegram, $user);
+                }
             }
         } else {
             $telegram->sendMessage($chatId, 'Comando não reconhecido. Use /start para começar.');
