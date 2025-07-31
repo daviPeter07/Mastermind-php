@@ -63,7 +63,7 @@ class AuthCommands
         $email = $sessions[$chatId]['email'];
 
         try {
-            $response = $this->httpClient->post('/api/auth/login', [
+            $response = $this->httpClient->post('/api/login', [
                 'json' => ['email' => $email, 'password' => $password]
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
@@ -128,7 +128,7 @@ class AuthCommands
         }
 
         try {
-            $response = $this->httpClient->post('/api/auth/register', [
+            $response = $this->httpClient->post('/api/register', [
                 'json' => ['name' => $name, 'email' => $email, 'password' => $password]
             ]);
 

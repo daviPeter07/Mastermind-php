@@ -63,7 +63,6 @@ class CommandHandler
             error_log("DEBUG: Estado awaiting_register detectado: $state");
             $handler = new AuthCommands();
             if ($state === 'awaiting_register_name') {
-                error_log("DEBUG: Chamando handleRegisterName");
                 $handler->handleRegisterName($chatId, $text, $telegram, $this->sessions);
                 return;
             }
@@ -73,7 +72,7 @@ class CommandHandler
             }
             if ($state === 'awaiting_register_password') {
                 $handler->handleRegisterPassword($chatId, $text, $telegram, $this->sessions);
-                return; // <-- ESSENCIAL: impede que caia no bloco de comandos
+                return;
             }
         }
 
