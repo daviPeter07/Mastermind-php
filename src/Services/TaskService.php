@@ -45,17 +45,42 @@ class TaskService {
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  public function findByUser(string $userId): array
+  public function findByUser(string $userId, ?string $period = null): array
   {
-    $stmt = $this->db->prepare(
-      "SELECT t.id, t.content, t.status, t.due_date, t.created_at, 
-              c.id as category_id, c.name as category_name
-       FROM tasks t 
-       INNER JOIN categories c ON t.category_id = c.id 
-       WHERE t.user_id = ? 
-       ORDER BY t.created_at DESC"
-    );
-    $stmt->execute([$userId]);
+    $sql = "SELECT t.id, t.content, t.status, t.due_date, t.created_at, 
+                   c.id as category_id, c.name as category_name
+            FROM tasks t 
+            INNER JOIN categories c ON t.category_id = c.id 
+            WHERE t.user_id = ?";
+    
+    $params = [$userId];
+    
+    // Adiciona filtro por período se especificado
+    if ($period) {
+      switch ($period) {
+        case 'today':
+        case 'hoje':
+          $sql .= " AND DATE(t.due_date) = CURDATE()";
+          break;
+        case 'week':
+        case 'semana':
+          $sql .= " AND t.due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)";
+          break;
+        case 'month':
+        case 'mes':
+          $sql .= " AND t.due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 1 MONTH)";
+          break;
+        case 'overdue':
+        case 'atrasadas':
+          $sql .= " AND t.due_date < CURDATE() AND t.status = 'PENDENTE'";
+          break;
+      }
+    }
+    
+    $sql .= " ORDER BY t.created_at DESC";
+    
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute($params);
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }

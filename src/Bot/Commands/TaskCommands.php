@@ -19,27 +19,39 @@ class TaskCommands
     $this->userService = new UserService();
   }
 
-  public function list(Message $message, BotApi $telegram, ?array $user)
+  public function list(Message $message, BotApi $telegram, ?array $user, ?string $filter = null)
   {
     $chatId = $message->getChat()->getId();
     $apiToken = $user['api_token'];
 
     try {
+      $params = [];
+      if ($filter) {
+        $params['period'] = $filter;
+      }
+      
       $response = $this->httpClient->get('/api/tasks', [
-        'headers' => ['Authorization' => 'Bearer ' . $apiToken]
+        'headers' => ['Authorization' => 'Bearer ' . $apiToken],
+        'query' => $params
       ]);
       $tasks = json_decode($response->getBody()->getContents(), true);
 
       if (empty($tasks)) {
-        $reply = 'Você ainda não tem nenhuma tarefa. Use /add_tarefa para criar uma!';
+        $filterText = $filter ? " para {$filter}" : "";
+        $reply = "Você ainda não tem nenhuma tarefa{$filterText}. Use /add_tarefa para criar uma!";
       } else {
-        $reply = "Suas tarefas:\n\n";
+        $filterText = $filter ? " ({$filter})" : "";
+        $reply = "Suas tarefas{$filterText}:\n\n";
         foreach ($tasks as $task) {
           $statusEmoji = $task['status'] === 'CONCLUIDA' ? '✅' : '📝';
           $content = htmlspecialchars($task['content'], ENT_QUOTES, 'UTF-8');
           $reply .= "{$statusEmoji} {$content}\n";
           $reply .= "   - ID: {$task['id']}\n";
-          $reply .= "   - Categoria: {$task['category_name']}\n\n";
+          $reply .= "   - Categoria: {$task['category_name']}\n";
+          if ($task['due_date']) {
+            $reply .= "   - Vencimento: " . date('d/m/Y', strtotime($task['due_date'])) . "\n";
+          }
+          $reply .= "\n";
         }
       }
       $telegram->sendMessage($chatId, $reply);

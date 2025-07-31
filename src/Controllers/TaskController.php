@@ -61,7 +61,8 @@ class TaskController
   public function index()
   {
     $userId = $this->getAuthenticatedUserId();
-    $tasks = $this->taskService->findByUser($userId);
+    $period = $_GET['period'] ?? null;
+    $tasks = $this->taskService->findByUser($userId, $period);
 
     http_response_code(200);
     echo json_encode($tasks);

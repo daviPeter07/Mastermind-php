@@ -8,6 +8,7 @@ use App\Services\UserService;
 use App\Bot\Commands\AuthCommands;
 use App\Bot\Commands\CategoryCommands;
 use App\Bot\Commands\TaskCommands;
+use App\Bot\Commands\HelpCommands;
 
 class CommandHandler
 {
@@ -19,6 +20,7 @@ class CommandHandler
         '/login'           => [AuthCommands::class, 'login'],
         '/register'        => [AuthCommands::class, 'register'],
         '/logout'          => [AuthCommands::class, 'logout'],
+        '/ajuda'           => [HelpCommands::class, 'show'],
         '/categorias'      => [CategoryCommands::class, 'list'],
         '/add_categoria'   => [CategoryCommands::class, 'create'],
         '/edit_categoria'  => [CategoryCommands::class, 'update'],
@@ -136,6 +138,17 @@ class CommandHandler
         if (preg_match('/^\/done\s+(\d+)/', $text, $matches)) {
             if ($user && $user['api_token']) {
                 (new TaskCommands())->done($message, $telegram, $user, $matches);
+            } else {
+                $telegram->sendMessage($chatId, 'Você precisa estar logado. Use /login.');
+            }
+            return;
+        }
+
+        // Comando com filtro: /tarefas <filtro>
+        if (preg_match('/^\/tarefas\s+(.+)/', $text, $matches)) {
+            if ($user && $user['api_token']) {
+                $filter = strtolower(trim($matches[1]));
+                (new TaskCommands())->list($message, $telegram, $user, $filter);
             } else {
                 $telegram->sendMessage($chatId, 'Você precisa estar logado. Use /login.');
             }
