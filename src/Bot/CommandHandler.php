@@ -60,7 +60,10 @@ class CommandHandler
             }
         }
         if ($state && str_starts_with($state, 'awaiting_register')) {
+            error_log("DEBUG: Estado awaiting_register detectado: $state");
+            $handler = new AuthCommands();
             if ($state === 'awaiting_register_name') {
+                error_log("DEBUG: Chamando handleRegisterName");
                 $handler->handleRegisterName($chatId, $text, $telegram, $this->sessions);
                 return;
             }
@@ -70,7 +73,7 @@ class CommandHandler
             }
             if ($state === 'awaiting_register_password') {
                 $handler->handleRegisterPassword($chatId, $text, $telegram, $this->sessions);
-                return;
+                return; // <-- ESSENCIAL: impede que caia no bloco de comandos
             }
         }
 
@@ -158,7 +161,7 @@ class CommandHandler
         if (isset($this->commandMap[$text])) {
             [$commandClass, $method] = $this->commandMap[$text];
 
-            if (str_contains($text, 'add_') || str_contains($text, 'edit_') || str_contains($text, 'del_') || str_contains($text, 'login')) {
+            if (str_contains($text, 'add_') || str_contains($text, 'edit_') || str_contains($text, 'del_') || str_contains($text, 'login') || str_contains($text, 'register')) {
                 (new $commandClass())->$method($message, $telegram, $this->sessions, $user);
             } else {
                 // Validação para logout - requer autenticação

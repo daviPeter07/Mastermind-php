@@ -23,10 +23,25 @@ class AuthController
             echo json_encode(['error' => 'Os campos name, email e password são obrigatórios.']);
             return;
         }
+
+        // Validação adicional para o nome
+        $name = trim($data['name']);
+        if (empty($name)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'O nome não pode estar vazio.']);
+            return;
+        }
+
+        // Validação de comprimento do nome
+        if (strlen($name) < 2 || strlen($name) > 255) {
+            http_response_code(400);
+            echo json_encode(['error' => 'O nome deve ter entre 2 e 255 caracteres.']);
+            return;
+        }
         
         try {
             //controller valida os dados e cria o objeto enviando pra logica do service, se estiver tudo ok : 201
-            $result = $this->authService->register($data['name'], $data['email'], $data['password']);
+            $result = $this->authService->register($name, $data['email'], $data['password']);
             http_response_code(201);
             echo json_encode($result);
         } catch (Exception $e) {

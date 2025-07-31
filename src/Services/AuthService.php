@@ -19,6 +19,12 @@ class AuthService
 
   public function register(string $name, string $email, string $password): array
   {
+    // Validação adicional no service
+    $name = trim($name);
+    if (empty($name)) {
+      throw new Exception("Nome não pode estar vazio");
+    }
+
     $stmt = $this->db->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->execute([$email]);
 
