@@ -60,7 +60,6 @@ class CommandHandler
             }
         }
         if ($state && str_starts_with($state, 'awaiting_register')) {
-            error_log("DEBUG: Estado awaiting_register detectado: $state");
             $handler = new AuthCommands();
             if ($state === 'awaiting_register_name') {
                 $handler->handleRegisterName($chatId, $text, $telegram, $this->sessions);

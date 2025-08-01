@@ -40,7 +40,6 @@ class AuthCommands
     {
         $chatId = (string) $message->getChat()->getId();
         $sessions[$chatId] = ['state' => 'awaiting_register_name'];
-        error_log("DEBUG: Register iniciado para chat ID: $chatId");
         $telegram->sendMessage($chatId, 'Ótimo! Vamos criar sua conta. Primeiro, qual é o seu nome?');
     }
 
@@ -86,8 +85,6 @@ class AuthCommands
 
     public function handleRegisterName(string $chatId, string $name, BotApi $telegram, array &$sessions)
     {
-        error_log("DEBUG: handleRegisterName chamado para chat ID: $chatId, nome: $name");
-        
         // Limpa e valida o nome
         $name = trim($name);
         if (empty($name)) {
