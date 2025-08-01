@@ -12,36 +12,34 @@ class Database
   public static function getConnection(): PDO
   {
     if (self::$instance === null) {
+      $host = getenv("DB_HOST");
+      $port = getenv("DB_PORT");
+      $user = getenv("POSTGRES_USER");
+      $pass = getenv("POSTGRES_PASSWORD");
+      $db   = getenv("POSTGRES_DB");
 
-      $connectionUrl = getenv("DATABASE_URL");
-
-      if ($connectionUrl === false) {
+      if (!$host || !$port || !$user || !$pass || !$db) {
         http_response_code(500);
-        echo json_encode(['error' => 'Erro na variavel de URL do DB.']);
+        echo json_encode(['error' => 'Variáveis de ambiente do banco ausentes ou incompletas.']);
         exit;
       }
 
-      $dbParts = parse_url($connectionUrl);
-
-      $host = $dbParts['host'];
-      $port = $dbParts['port'];
-      $user = $dbParts['user'];
-      $pass = $dbParts['pass'];
-      $db   = ltrim($dbParts['path'], '/');
-
-      //conecta ao banco (Data Source Name)
       $dsn = "pgsql:host=$host;port=$port;dbname=$db";
 
       try {
         self::$instance = new PDO($dsn, $user, $pass, [
           PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ]);
-      } catch (PDOException) {
+      } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Erro de conexão com o banco de dados.']);
+        echo json_encode([
+          'error' => 'Erro de conexão com o banco de dados.',
+          'details' => $e->getMessage()
+        ]);
         exit;
       }
     }
+
     return self::$instance;
   }
 }

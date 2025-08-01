@@ -11,10 +11,77 @@ services:
     type: web
     plan: free
     env: docker
+    autoDeploy: true
     envVars:
+      - key: PORT
+        value: 8000
       - key: JWT_SECRET
         sync: false
       - key: TELEGRAM_BOT_TOKEN
         sync: false
       - key: MASTERMIND_API_TOKEN
         sync: false
+
+      # Bindings automáticos com o banco
+      - fromDatabase:
+          name: mastermind-db
+          property: host
+        key: DB_HOST
+      - fromDatabase:
+          name: mastermind-db
+          property: user
+        key: POSTGRES_USER
+      - fromDatabase:
+          name: mastermind-db
+          property: password
+        key: POSTGRES_PASSWORD
+      - fromDatabase:
+          name: mastermind-db
+          property: database
+        key: POSTGRES_DB
+      - fromDatabase:
+          name: mastermind-db
+          property: port
+        key: DB_PORT
+
+    dependsOn:
+      - name: mastermind-db
+
+  - name: mastermind-bot
+    type: worker
+    plan: free
+    env: docker
+    dockerCommand: php scripts/run-bot.php
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: MASTERMIND_API_TOKEN
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+
+      # Bindings automáticos com o banco
+      - fromDatabase:
+          name: mastermind-db
+          property: host
+        key: DB_HOST
+      - fromDatabase:
+          name: mastermind-db
+          property: user
+        key: POSTGRES_USER
+      - fromDatabase:
+          name: mastermind-db
+          property: password
+        key: POSTGRES_PASSWORD
+      - fromDatabase:
+          name: mastermind-db
+          property: database
+        key: POSTGRES_DB
+      - fromDatabase:
+          name: mastermind-db
+          property: port
+        key: DB_PORT
+
+    dependsOn:
+      - name: mastermind-app
+      - name: mastermind-db
