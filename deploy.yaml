@@ -1,0 +1,20 @@
+services:
+  - name: mastermind-db
+    type: pgs
+    plan: free
+    postgres:
+      version: 15
+
+  - name: mastermind-app
+    type: web
+    plan: free
+    env: docker
+    healthCheck:
+      path: /
+    envVars:
+      - key: JWT_SECRET
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: MASTERMIND_API_TOKEN
+        sync: false
