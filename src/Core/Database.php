@@ -5,16 +5,29 @@ namespace App\Core;
 use PDO;
 use PDOException;
 
-class Database {
+class Database
+{
   private static ?PDO $instance = null;
 
-  public static function getConnection(): PDO {
+  public static function getConnection(): PDO
+  {
     if (self::$instance === null) {
-      $host = "postgres";
-      $port = getenv('DB_PORT') ?: 5432;
-      $db = getenv('POSTGRES_DB');
-      $user = getenv('POSTGRES_USER');
-      $pass = getenv('POSTGRES_PASSWORD');
+
+      $connectionUrl = getenv("DATABASE_URL");
+
+      if ($connectionUrl === false) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Erro na variavel de URL do DB.']);
+        exit;
+      }
+
+      $dbParts = parse_url($connectionUrl);
+
+      $host = $dbParts['host'];
+      $port = $dbParts['port'];
+      $user = $dbParts['user'];
+      $pass = $dbParts['pass'];
+      $db   = ltrim($dbParts['path'], '/');
 
       //conecta ao banco (Data Source Name)
       $dsn = "pgsql:host=$host;port=$port;dbname=$db";
