@@ -1,6 +1,6 @@
 services:
   - name: mastermind-db
-    type: pgs
+    type: psql
     plan: free
     postgres:
       version: 15
