@@ -3,8 +3,6 @@ databases:
     databaseName: mastermind
     user: mastermind_user
     plan: free
-    postgres:
-      version: 15
 
 services:
   - name: mastermind-app
@@ -44,9 +42,6 @@ services:
           property: port
         key: DB_PORT
 
-    dependsOn:
-      - name: mastermind-db
-
   - name: mastermind-bot
     type: worker
     plan: free
@@ -81,7 +76,3 @@ services:
           name: mastermind-db
           property: port
         key: DB_PORT
-
-    dependsOn:
-      - name: mastermind-app
-      - name: mastermind-db
