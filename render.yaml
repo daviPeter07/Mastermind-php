@@ -1,16 +1,16 @@
-services:
+databases:
   - name: mastermind-db
-    type: psql
+    databaseName: mastermind
+    user: mastermind_user
     plan: free
     postgres:
       version: 15
 
+services:
   - name: mastermind-app
     type: web
     plan: free
     env: docker
-    healthCheck:
-      path: /
     envVars:
       - key: JWT_SECRET
         sync: false
