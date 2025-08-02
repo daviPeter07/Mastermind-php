@@ -13,9 +13,9 @@ class Bot
 
   public function __construct()
   {
-    $botToken = $_ENV['TELEGRAM_BOT_TOKEN'] ?? null;
+    $botToken = getenv('TELEGRAM_BOT_TOKEN') ?: $_ENV['TELEGRAM_BOT_TOKEN'] ?? null;
     if (!$botToken) {
-      throw new Exception("TELEGRAM_BOT_TOKEN não definido no .env");
+      throw new Exception("TELEGRAM_BOT_TOKEN não definido nas variáveis de ambiente");
     }
 
     $this->telegram = new BotApi($botToken);
