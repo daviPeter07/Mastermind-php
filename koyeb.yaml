@@ -1,0 +1,63 @@
+name: mastermind-bot
+services:
+  - name: mastermind-app
+    type: web
+    ports:
+      - port: 80
+        protocol: http
+    env:
+      - name: POSTGRES_DB
+        value: mastermind
+      - name: POSTGRES_USER
+        value: mastermind_user
+      - name: POSTGRES_PASSWORD
+        secret: postgres-password
+      - name: DB_PORT
+        value: "5432"
+      - name: JWT_SECRET
+        secret: jwt-secret
+      - name: TELEGRAM_BOT_TOKEN
+        secret: telegram-bot-token
+      - name: MASTERMIND_API_TOKEN
+        secret: mastermind-api-token
+    docker:
+      image: mastermind-php:latest
+      dockerfile: ./dockerfile
+    routes:
+      - path: /
+        protocol: http
+    health_checks:
+      - type: http
+        path: /
+        port: 80
+        interval: 30s
+        timeout: 10s
+        retries: 3
+
+  - name: mastermind-bot
+    type: worker
+    env:
+      - name: POSTGRES_DB
+        value: mastermind
+      - name: POSTGRES_USER
+        value: mastermind_user
+      - name: POSTGRES_PASSWORD
+        secret: postgres-password
+      - name: DB_PORT
+        value: "5432"
+      - name: JWT_SECRET
+        secret: jwt-secret
+      - name: TELEGRAM_BOT_TOKEN
+        secret: telegram-bot-token
+      - name: MASTERMIND_API_TOKEN
+        secret: mastermind-api-token
+    docker:
+      image: mastermind-php:latest
+      dockerfile: ./dockerfile
+    command: php scripts/run-bot.php
+
+databases:
+  - name: mastermind-db
+    type: postgresql
+    version: "15"
+    plan: free 
