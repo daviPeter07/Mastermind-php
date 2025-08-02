@@ -1,31 +1,33 @@
+# Exported from Render on 2025-08-02T04:21:35Z
 databases:
-  - name: mastermind-db
-    databaseName: mastermindDBPHP
-    user: daviAdmin
-    plan: free
-
+- name: mastermind-db
+  databaseName: mastermind_l0s0
+  user: mastermind_user
+  plan: free
+  region: oregon
+  ipAllowList:
+  - source: 0.0.0.0/0
+    description: everywhere
+  postgresMajorVersion: "16"
 services:
-  - name: mastermind-app
-    type: web
-    plan: free
-    env: docker
-    autoDeploy: true
-    healthCheck:
-      path: /
-    envVars:
-      - key: DB_HOST
-        fromDatabase: { name: mastermind-db, property: host }
-      - key: DB_PORT
-        fromDatabase: { name: mastermind-db, property: port }
-      - key: POSTGRES_DB
-        fromDatabase: { name: mastermind-db, property: database }
-      - key: POSTGRES_USER
-        fromDatabase: { name: mastermind-db, property: user }
-      - key: POSTGRES_PASSWORD
-        fromDatabase: { name: mastermind-db, property: password }
-      - key: JWT_SECRET
-        sync: false
-      - key: TELEGRAM_BOT_TOKEN
-        sync: false
-      - key: MASTERMIND_API_TOKEN
-        sync: false
+- type: web
+  name: mastermind-app
+  runtime: docker
+  repo: https://github.com/daviPeter07/Mastermind-php
+  plan: free
+  envVars:
+  - key: DATABASE_URL
+    fromDatabase:
+      name: mastermind-db
+      property: connectionString
+  - key: MASTERMIND_API_TOKEN
+    sync: false
+  - key: TELEGRAM_BOT_TOKEN
+    sync: false
+  - key: JWT_SECRET
+    sync: false
+  region: oregon
+  dockerContext: .
+  dockerfilePath: ./Dockerfile
+  autoDeployTrigger: commit
+version: "1"
