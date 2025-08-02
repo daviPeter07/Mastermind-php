@@ -14,18 +14,29 @@ try {
     
     $pdo = Database::getConnection();
     
-    // Verifica se a tabela users já existe
-    $stmt = $pdo->query("SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name = 'users'
-    )");
-    $tableExists = $stmt->fetchColumn();
+    // Verifica se todas as tabelas já existem
+    $requiredTables = ['users', 'categories', 'tasks'];
+    $existingTables = [];
     
-    if ($tableExists) {
-        echo "✅ Tabelas já existem, pulando migração.\n";
+    foreach ($requiredTables as $table) {
+        $stmt = $pdo->query("SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name = '$table'
+        )");
+        $exists = $stmt->fetchColumn();
+        $existingTables[$table] = $exists;
+        
+        echo $exists ? "✅ Tabela '$table' existe\n" : "❌ Tabela '$table' não existe\n";
+    }
+    
+    // Se todas as tabelas existem, pula a migração
+    if (array_sum($existingTables) === count($requiredTables)) {
+        echo "✅ Todas as tabelas já existem, pulando migração.\n";
         return;
     }
+    
+    echo "🔄 Algumas tabelas estão faltando, executando migração...\n";
     
     echo "🔄 Executando migração do banco...\n";
     
