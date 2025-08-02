@@ -13,6 +13,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - DB_PORT=${DB_PORT}
+      - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - MASTERMIND_API_TOKEN=${MASTERMIND_API_TOKEN}
@@ -55,6 +56,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
+      - DATABASE_URL=${DATABASE_URL}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - MASTERMIND_API_TOKEN=${MASTERMIND_API_TOKEN}
       - POSTGRES_DB=${POSTGRES_DB}

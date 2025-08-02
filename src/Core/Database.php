@@ -15,24 +15,15 @@ class Database
       $connectionUrl = getenv('DATABASE_URL');
 
       if ($connectionUrl === false) {
-        http_response_code(500);
-        echo json_encode(['error' => 'A variável de ambiente DATABASE_URL não foi definida.']);
-        exit;
+        die("Erro fatal: A variável de ambiente DATABASE_URL não foi definida.");
       }
 
       $dbParts = parse_url($connectionUrl);
-
-      if (!$dbParts) {
-        http_response_code(500);
-        echo json_encode(['error' => 'DATABASE_URL inválida']);
-        exit;
-      }
-
-      $host = $dbParts['host'] ?? 'localhost';
-      $port = $dbParts['port'] ?? '5432';
-      $user = $dbParts['user'] ?? '';
-      $pass = $dbParts['pass'] ?? '';
-      $db   = ltrim($dbParts['path'] ?? '', '/');
+      $host = $dbParts['host'];
+      $port = $dbParts['port'];
+      $user = $dbParts['user'];
+      $pass = $dbParts['pass'];
+      $db   = ltrim($dbParts['path'], '/');
 
       $dsn = "pgsql:host=$host;port=$port;dbname=$db";
 
@@ -41,10 +32,7 @@ class Database
           PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ]);
       } catch (PDOException $e) {
-        http_response_code(500);
-        error_log("Erro de conexão com o banco de dados: " . $e->getMessage());
-        echo json_encode(['error' => 'Erro de conexão com o banco de dados.']);
-        exit;
+        die("Erro de conexão com o banco de dados: " . $e->getMessage());
       }
     }
     return self::$instance;

@@ -1,37 +1,28 @@
+# Dockerfile (versão final para deploy)
+
+# Estágio 1: Instala as dependências com o Composer
 FROM composer:2 as builder
 WORKDIR /app
-# Otimização: Copia só os arquivos de dependência primeiro
 COPY composer.json composer.lock ./
-# Instala as dependências
 RUN composer install --no-dev --no-interaction --optimize-autoloader
-# Agora sim, copia o resto do projeto
 COPY . .
 
-FROM php:8.3-apache
+# Estágio 2: Cria a imagem final e limpa do PHP
+FROM php:8.3-cli
 WORKDIR /app
-# Copia o código e as dependências já instaladas do estágio anterior
 COPY --from=builder /app .
 
-# Instala as extensões necessárias
+# Instala as dependências de sistema: a do PostgreSQL e o Supervisor
 RUN apt-get update && apt-get install -y \
     libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql \
-    && a2enmod rewrite \
-    && a2enmod headers
+    supervisor \
+    && docker-php-ext-install pdo pdo_pgsql
 
-# Copia a configuração Apache personalizada
-COPY apache.conf /etc/apache2/sites-available/000-default.conf
+# Copia nosso arquivo de configuração do Supervisor para o lugar certo
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Configura permissões e propriedade
-RUN chown -R www-data:www-data /app && \
-    chmod -R 755 /app
+# Expõe a porta 8000 para a API
+EXPOSE 8000
 
-# Torna o script executável
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-
-# "Abre" a porta 80 do contêiner para o mundo exterior
-EXPOSE 80
-
-# O comando que será executado para iniciar Apache + Bot
-CMD ["/app/start.sh"]
+# Comando final: inicia o Supervisor, que vai gerenciar nossos 2 processos
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
