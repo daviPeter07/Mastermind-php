@@ -13,7 +13,6 @@ use App\Controllers\AuthController;
 use App\Controllers\UserController;
 use App\Controllers\CategoryController;
 use App\Controllers\TaskController;
-use App\Controllers\WebhookController;
 
 //res : json
 header('Content-Type: application/json');
@@ -46,8 +45,5 @@ $router->put('/api/tasks/{id}', [TaskController::class, 'update']);
 $router->delete('/api/tasks/{id}', [TaskController::class, 'delete']);
 $router->get('/api/categories/{id}/tasks', [TaskController::class, 'findByCategory']);
 $router->patch('/api/tasks/{id}/status', [TaskController::class, 'updateStatus']);
-
-// Webhook para o bot do Telegram
-$router->post('/webhook', [WebhookController::class, 'handle']);
 
 $router->dispatch();  
