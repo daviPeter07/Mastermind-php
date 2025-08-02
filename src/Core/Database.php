@@ -22,11 +22,17 @@ class Database
 
       $dbParts = parse_url($connectionUrl);
 
-      $host = $dbParts['host'];
-      $port = $dbParts['port'];
-      $user = $dbParts['user'];
-      $pass = $dbParts['pass'];
-      $db   = ltrim($dbParts['path'], '/');
+      if (!$dbParts) {
+        http_response_code(500);
+        echo json_encode(['error' => 'DATABASE_URL inválida']);
+        exit;
+      }
+
+      $host = $dbParts['host'] ?? 'localhost';
+      $port = $dbParts['port'] ?? '5432';
+      $user = $dbParts['user'] ?? '';
+      $pass = $dbParts['pass'] ?? '';
+      $db   = ltrim($dbParts['path'] ?? '', '/');
 
       $dsn = "pgsql:host=$host;port=$port;dbname=$db";
 
