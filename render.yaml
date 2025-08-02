@@ -1,14 +1,12 @@
-# Exported from Render on 2025-08-02T04:21:35Z
+# render.yaml (Versão Corrigida)
+
 databases:
 - name: mastermind-db
   databaseName: mastermind_l0s0
   user: mastermind_user
   plan: free
   region: oregon
-  ipAllowList:
-  - source: 0.0.0.0/0
-    description: everywhere
-  postgresMajorVersion: "16"
+
 services:
 - type: web
   name: mastermind-app
@@ -29,5 +27,24 @@ services:
   region: oregon
   dockerContext: .
   dockerfilePath: ./Dockerfile
-  autoDeployTrigger: commit
-version: "1"
+
+- type: worker
+  name: mastermind-bot
+  runtime: docker
+  repo: https://github.com/daviPeter07/Mastermind-php
+  plan: free
+  dockerCommand: php scripts/run-bot.php
+  envVars:
+  - key: DATABASE_URL
+    fromDatabase:
+      name: mastermind-db
+      property: connectionString
+  - key: MASTERMIND_API_TOKEN
+    sync: false
+  - key: TELEGRAM_BOT_TOKEN
+    sync: false
+  - key: JWT_SECRET
+    sync: false
+  region: oregon
+  dockerContext: .
+  dockerfilePath: ./Dockerfile
