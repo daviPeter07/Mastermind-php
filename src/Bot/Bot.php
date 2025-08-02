@@ -28,6 +28,19 @@ class Bot
   {
     echo "🤖 Bot Mastermind (Estruturado) iniciando...\n";
 
+    // Verifica se já existe uma instância rodando
+    $lockFile = '/tmp/bot_mastermind.lock';
+    if (file_exists($lockFile)) {
+      $pid = file_get_contents($lockFile);
+      if (posix_kill($pid, 0)) {
+        echo "❌ Bot já está rodando (PID: $pid)\n";
+        exit(1);
+      }
+    }
+    
+    // Cria arquivo de lock
+    file_put_contents($lockFile, getmypid());
+
     // 1. Valida o token antes de iniciar o loop principal
     if (!$this->validateBotToken()) {
     }
@@ -54,7 +67,7 @@ class Bot
           }
         }
 
-        sleep(1);
+        sleep(3); // Aumenta o delay para evitar conflitos
       } catch (Exception $e) {
         $errorCounter++;
         $this->handleListenError($e, $errorCounter);
