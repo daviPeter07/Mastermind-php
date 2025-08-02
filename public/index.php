@@ -15,13 +15,14 @@ use App\Controllers\AuthController;
 use App\Controllers\UserController;
 use App\Controllers\CategoryController;
 use App\Controllers\TaskController;
+use App\Controllers\HealthController;
 
 //res : json
 header('Content-Type: application/json');
 
 $router = new Router();
 //rotas e requisições
-
+$router->get('/', [HealthController::class, 'check']);
 //autentificação
 $router->post('/api/register', [AuthController::class, 'register']);
 $router->post('/api/login', [AuthController::class, 'login']);
