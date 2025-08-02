@@ -36,8 +36,21 @@ class Bot
     // 2. Configura webhook para evitar conflitos
     $webhookUrl = getenv('WEBHOOK_URL') ?: 'https://mastermind-app-s9tf.onrender.com/webhook';
     try {
-      $this->telegram->setWebhook($webhookUrl);
-      echo "✅ Webhook configurado: $webhookUrl\n";
+      // Remove webhook anterior se existir
+      $this->telegram->deleteWebhook();
+      
+      // Configura novo webhook
+      $result = $this->telegram->setWebhook($webhookUrl);
+      
+      if ($result) {
+        echo "✅ Webhook configurado: $webhookUrl\n";
+        
+        // Verifica se o webhook foi configurado corretamente
+        $webhookInfo = $this->telegram->getWebhookInfo();
+        echo "📡 Webhook info: " . json_encode($webhookInfo) . "\n";
+      } else {
+        throw new Exception("Falha ao configurar webhook");
+      }
     } catch (Exception $e) {
       echo "⚠️ Erro ao configurar webhook: " . $e->getMessage() . "\n";
       echo "🔄 Usando polling como fallback...\n";
