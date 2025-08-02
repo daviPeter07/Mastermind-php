@@ -27,9 +27,10 @@ services:
   region: oregon
   dockerContext: .
   dockerfilePath: ./Dockerfile
-  dockerCommand: |
+  preDeployCommand: |
+    echo "Rodando as migrações..."
     php scripts/run-migrations.php
-    php -S 0.0.0.0:8000 -t public
+  dockerCommand: php -S 0.0.0.0:8000 -t public
 
 - type: worker
   name: mastermind-bot
