@@ -1,0 +1,31 @@
+databases:
+  - name: mastermind-db
+    databaseName: mastermind
+    user: mastermind_user
+    plan: free
+
+services:
+  - name: mastermind-app
+    type: web
+    plan: free
+    env: docker
+    autoDeploy: true
+    port: 80
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mastermind-db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: MASTERMIND_API_TOKEN
+        sync: false
+      - key: POSTGRES_DB
+        value: mastermind
+      - key: POSTGRES_USER
+        value: mastermind_user
+      - key: DB_PORT
+        value: "5432"
+    healthCheckPath: / 
