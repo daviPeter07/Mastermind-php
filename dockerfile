@@ -26,8 +26,12 @@ COPY apache.conf /etc/apache2/sites-available/000-default.conf
 RUN chown -R www-data:www-data /app && \
     chmod -R 755 /app
 
+# Torna o script executável
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 # "Abre" a porta 80 do contêiner para o mundo exterior
 EXPOSE 80
 
-# O comando que será executado para iniciar o servidor Apache
-CMD ["apache2-foreground"]
+# O comando que será executado para iniciar Apache + Bot
+CMD ["/app/start.sh"]
