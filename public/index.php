@@ -4,10 +4,8 @@
 require __DIR__ . "/../vendor/autoload.php";
 
 //lib pra ler as envs
-if (file_exists(__DIR__ . '/../.env')) {
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-    $dotenv->load();
-}
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
 
 //import de controller e reqs
 use App\Core\Router;
