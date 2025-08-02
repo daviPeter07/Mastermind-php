@@ -25,4 +25,4 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 8000
 
 # Comando final: inicia o Supervisor, que vai gerenciar nossos 2 processos
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
+CMD ["/app/start.sh"]
