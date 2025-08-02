@@ -19,7 +19,8 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_pgsql
 
 # Copia nosso arquivo de configuração do Supervisor para o lugar certo
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
 # Expõe a porta 8000 para a API
 EXPOSE 8000
