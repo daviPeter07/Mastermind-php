@@ -12,17 +12,21 @@ class Database
   public static function getConnection(): PDO
   {
     if (self::$instance === null) {
-      $host = getenv("DB_HOST");
-      $port = getenv("DB_PORT");
-      $user = getenv("POSTGRES_USER");
-      $pass = getenv("POSTGRES_PASSWORD");
-      $db   = getenv("POSTGRES_DB");
+      $connectionUrl = getenv('DATABASE_URL');
 
-      if (!$host || !$port || !$user || !$pass || !$db) {
+      if ($connectionUrl === false) {
         http_response_code(500);
-        echo json_encode(['error' => 'Variáveis de ambiente do banco ausentes ou incompletas.']);
+        echo json_encode(['error' => 'A variável de ambiente DATABASE_URL não foi definida.']);
         exit;
       }
+
+      $dbParts = parse_url($connectionUrl);
+
+      $host = $dbParts['host'];
+      $port = $dbParts['port'];
+      $user = $dbParts['user'];
+      $pass = $dbParts['pass'];
+      $db   = ltrim($dbParts['path'], '/');
 
       $dsn = "pgsql:host=$host;port=$port;dbname=$db";
 
@@ -32,14 +36,11 @@ class Database
         ]);
       } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode([
-          'error' => 'Erro de conexão com o banco de dados.',
-          'details' => $e->getMessage()
-        ]);
+        error_log("Erro de conexão com o banco de dados: " . $e->getMessage());
+        echo json_encode(['error' => 'Erro de conexão com o banco de dados.']);
         exit;
       }
     }
-
     return self::$instance;
   }
 }
