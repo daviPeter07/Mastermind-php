@@ -21,10 +21,4 @@ services:
         sync: false
       - key: MASTERMIND_API_TOKEN
         sync: false
-      - key: POSTGRES_DB
-        value: mastermind
-      - key: POSTGRES_USER
-        value: mastermind_user
-      - key: DB_PORT
-        value: "5432"
     healthCheckPath: / 
