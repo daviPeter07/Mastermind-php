@@ -12,6 +12,8 @@ services:
     autoDeploy: true
     healthCheck:
       path: /
+      startup:
+        initialDelaySeconds: 30
     envVars:
       - key: DATABASE_URL
         fromDatabase:
