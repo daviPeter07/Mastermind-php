@@ -33,6 +33,14 @@ class Bot
       return;
     }
 
+    // Adicione esta linha para garantir que qualquer webhook ativo seja removido
+    try {
+      $this->telegram->deleteWebhook();
+      echo "🗑️ Webhook removido com sucesso!\n";
+    } catch (Exception $e) {
+      echo "❗️ Aviso: Não foi possível remover o webhook. Causa: " . $e->getMessage() . "\n";
+    }
+
     // 2. Inicia polling simples
     $this->startPolling();
   }
@@ -40,7 +48,7 @@ class Bot
   private function startPolling()
   {
     echo "🔄 Iniciando polling...\n";
-    
+
     $offset = 0;
     $errorCounter = 0;
 
