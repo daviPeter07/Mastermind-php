@@ -1,4 +1,4 @@
-# render.yaml (Versão Corrigida)
+# render.yaml (Versão Definitiva)
 
 databases:
 - name: mastermind-db
@@ -27,22 +27,14 @@ services:
   region: oregon
   dockerContext: .
   dockerfilePath: ./Dockerfile
-  preDeployCommand: |
-    echo "Rodando as migrações..."
-    php scripts/run-migrations.php
-  dockerCommand: php -S 0.0.0.0:8000 -t public
+  dockerCommand: sh -c "php scripts/run-migrations.php && php -S 0.0.0.0:8000 -t public"
 
 - type: worker
   name: mastermind-bot
   runtime: docker
   repo: https://github.com/daviPeter07/Mastermind-php
   plan: free
-  dockerCommand: |
-    until php -r "try { new PDO(getenv('DATABASE_URL')); exit(0); } catch (PDOException \$e) { exit(1); }"; do
-      echo "Aguardando o banco de dados..."
-      sleep 1
-    done
-    php scripts/run-bot.php
+  dockerCommand: sh -c "until php -r \"try { new PDO(getenv('DATABASE_URL')); exit(0); } catch (PDOException \$e) { exit(1); }\"; do echo \"Aguardando o banco de dados...\"; sleep 1; done && php scripts/run-bot.php"
   envVars:
   - key: DATABASE_URL
     fromDatabase:
