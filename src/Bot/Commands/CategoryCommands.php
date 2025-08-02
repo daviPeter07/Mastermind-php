@@ -13,7 +13,8 @@ class CategoryCommands
 
   public function __construct()
   {
-    $this->httpClient = new Client(['base_uri' => 'http://app:8000']);
+    $baseUri = getenv('API_BASE_URL') ?: 'http://localhost';
+    $this->httpClient = new Client(['base_uri' => $baseUri]);
   }
 
   public function list(Message $message, BotApi $telegram, ?array $user)

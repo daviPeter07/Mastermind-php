@@ -16,7 +16,8 @@ class AuthCommands
     public function __construct()
     {
         $this->userService = new UserService();
-        $this->httpClient = new Client(['base_uri' => 'http://app:8000']);
+        $baseUri = getenv('API_BASE_URL') ?: 'http://localhost';
+        $this->httpClient = new Client(['base_uri' => $baseUri]);
     }
 
     public function start(Message $message, BotApi $telegram, ?array $user)
