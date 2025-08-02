@@ -23,6 +23,11 @@ RUN apt-get update && apt-get install -y \
 RUN sed -i 's/DocumentRoot \/var\/www\/html/DocumentRoot \/app\/public/' /etc/apache2/sites-available/000-default.conf
 RUN sed -i 's/<Directory \/var\/www\/>/<Directory \/app\/public\/>/' /etc/apache2/sites-available/000-default.conf
 
+# Configura as permissões corretas
+RUN chown -R www-data:www-data /app \
+    && chmod -R 755 /app \
+    && chmod -R 755 /app/public
+
 # "Abre" a porta 80 do contêiner para o mundo exterior
 EXPOSE 80
 
