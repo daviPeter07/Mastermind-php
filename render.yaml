@@ -33,7 +33,14 @@ services:
   runtime: docker
   repo: https://github.com/daviPeter07/Mastermind-php
   plan: free
-  dockerCommand: php scripts/run-bot.php
+  # AQUI ESTÁ A MUDANÇA
+  dockerCommand: |
+    until php -r "try { new PDO(getenv('DATABASE_URL')); exit(0); } catch (PDOException \$e) { exit(1); }"; do
+      echo "Aguardando o banco de dados..."
+      sleep 1
+    done
+    php scripts/run-bot.php
+  # FIM DA MUDANÇA
   envVars:
   - key: DATABASE_URL
     fromDatabase:
